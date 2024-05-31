@@ -1,13 +1,14 @@
 {
-  "name": "post-mania", // Replace with your project name
+  "name": "backend-project",
   "version": "1.0.0",
-  "description": "post-mania backend project",
+  "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js", // Script to start the application locally
-    "vercel-build": "node app.js" // Script for Vercel deployment (if using Vercel)
+    "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node app.js",
+    "vercel-build": "node app.js",
   },
-  "author": "Your Name/Organization",
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -16,6 +17,6 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.0",
-    "multer": "^1.4.5-lts.1" // For file uploads (optional)
+    "multer": "^1.4.5-lts.1"
   }
 }
