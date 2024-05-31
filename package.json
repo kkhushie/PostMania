@@ -8,7 +8,7 @@
         "start": "node app.js",
     "vercel-build": "node app.js",
   },
-  "author": "",
+ { "author": "",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
