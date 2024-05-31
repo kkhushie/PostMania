@@ -4,14 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-<<<<<<< HEAD
-    "start": "node app.js", 
-    "test": "echo \"Error: no test specified\" && exit 1"
-=======
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
     "vercel-build": "node app.js"
->>>>>>> 7dc772e4c6bbcf3c5e77e25078693b1e129b92ab
   },
   "author": "",
   "license": "ISC",
