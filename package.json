@@ -4,9 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "vercel-build": "npm install && npm run build"
-  },
+  "build": "echo Built for production"
+}
   "author": "",
   "license": "ISC",
   "dependencies": {
