@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
-  "scripts": {
-  "build": "echo Built for production"
-}
+"scripts": {
+  "vercel-build": "node app.js"  // Replace app.js with your main application entry point
+},
   "author": "",
   "license": "ISC",
   "dependencies": {
