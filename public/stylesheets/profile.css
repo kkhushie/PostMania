@@ -1,0 +1,21 @@
+@media (max-width: 600px) {
+   .profile-container {
+        width: 100%;
+        padding: 0;
+    }
+
+    .header{
+        margin-top: 20px;
+
+    }
+    .profile-container textarea{
+        width: 90%;
+    }
+    input.submit-btn{
+        padding: 4px 8px;
+        width: fit-content;
+    }
+    div.postcontainer div.post{
+        width: 80%;
+    }
+}

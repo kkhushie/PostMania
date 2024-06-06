@@ -1,0 +1,8 @@
+@media (max-width:600px){
+    .edit-page textarea{
+        width: 80%;
+    }
+    .edit-page .submit-btn{
+        padding: 5px 2px;
+    }
+}

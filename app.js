@@ -72,23 +72,40 @@ app.post("/register", async (req, res) => {
 
             let token = jwt.sign({ email: email, userid: user._id }, process.env.JWT_SECRET);
             res.cookie("token", token, { secure: true, httpOnly: true });
-            res.redirect("/login");
+            res.redirect("/feed");
         });
     });
 });
 
 app.post("/login", async (req, res) => {
     let { email, password } = req.body;
-    let user = await userModel.findOne({ email });
-    if (!user) return res.redirect('/login');
+    console.log(`Email: ${email}, Password: ${password}`);
 
-    bcrypt.compare(password, user.password, (err, result) => {
-        if (result) {
-            let token = jwt.sign({ email: email, userid: user._id }, process.env.JWT_SECRET);
-            res.cookie("token", token, { secure: true, httpOnly: true });
-            res.redirect('/feed');
-        } else res.redirect("/login");
-    });
+    try {
+        let user = await userModel.findOne({ email });
+        if (!user) {
+            console.log('User not found');
+            return res.redirect('/login');
+        }
+
+        bcrypt.compare(password, user.password, (err, result) => {
+            if (err) {
+                console.error('Error comparing passwords', err);
+                return res.redirect('/login');
+            }
+            if (result) {
+                let token = jwt.sign({ email: email, userid: user._id }, process.env.JWT_SECRET);
+                res.cookie("token", token, { secure: false, httpOnly: true }); // Set secure to true if using HTTPS
+                res.redirect('/feed');
+            } else {
+                console.log('Password mismatch');
+                res.redirect("/login");
+            }
+        });
+    } catch (error) {
+        console.error('Error during login process', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 app.get("/logout", (req, res) => {
