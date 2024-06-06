@@ -5,13 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PostMania</title>
+    <link rel="stylesheet" href="/stylesheets/styles.css">
+
     <link rel="stylesheet" href="/stylesheets/feed.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body>
     <div class="feed w-full min-h-screen bg-zinc-900 p-5 text-white">
-        <div class="flex justify-end w-[94%] fixed items-center gap-3">
+        <div class="flex justify-end p-4 z-70 w-[94%] bg-zinc-900 fixed items-center gap-3 top-0">
             <h3><a href="/profile" class="text-white">
                     <div class="w-10 h-10 rounded-[50%] border-[1px] border-zinc-700 overflow-hidden">
                             <img class="w-full h-full object-cover" src="/images/uploads/<%= profile.profilepic %>">
@@ -26,12 +28,15 @@
                 <%posts.reverse().forEach((post)=>{%>
                     <div class="post w-1/3 p-4 mb-4 rounded-md bg-zinc-800 border-[1px] border-zinc-700">
                         <div class="flex gap-2 items-center mb-3">
-                            <div class="w-8 h-8 rounded-[50%] border-[1px] border-zinc-700 overflow-hidden">
+                            <div class="w-10 h-10 rounded-[50%] border-[1px] border-zinc-700 overflow-hidden">
                                 <img class="w-full h-full object-cover" src="/images/uploads/<%=post.user.profilepic %>"
                                     alt="img">
                             </div>
-                            <h4 class="text-blue-500">@<%= post.user.username%>
-                            </h4>
+                            <div class=" flex flex-col gap-0">
+                                <h4 class="text-blue-500">@<%= post.user.username%>
+                                </h4>
+                                <p class=" text-sm text-zinc-500"><%= formatDistanceToNow(new Date(post.date), { addSuffix: true }) %></p>
+                            </div>
                         </div>
 
                         <p class="text-sm tracking-tight">
@@ -45,7 +50,7 @@
                         </div>
                         <div class="btns gap-4 flex">
                             <a href="/like/<%= post._id%>" class="text-blue-500">
-                                <%= (post.likes.indexOf(post.user._id)===-1)?"Like":"Unlike" %>
+                                <%= post.likes.indexOf(profile._id) === -1 ? "Like" : "Unlike" %>
                             </a>
                             <a href="/edit/<%= post._id%>" class="text-zinc-600">
                                 <%if(post.user.email==profile.email){%>
@@ -61,6 +66,7 @@
                             <%}%>
         </div>
     </div>
+    <script src="/javascripts/feed.js"></script>
 </body>
 
 </html>

@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>PostMania</title>
+    <link rel="stylesheet" href="/stylesheets/styles.css">
     <link rel="stylesheet" href="/stylesheets/profile.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -56,6 +57,7 @@
                             <a href="/like/<%= post._id%>" class="text-blue-500">
                                 <%= (post.likes.indexOf(user._id)==-1)?"Like":"Unlike" %>
                             </a> <a href="/edit/<%= post._id%>" class="text-zinc-600">edit</a>
+                            <a href="/delete/<%= post._id%>" class="text-red-500 delete-btn">Delete</a>
                         </div>
                     </div>
                     <%})%>
@@ -64,6 +66,9 @@
         
     </div>
     </div>
+    <script>
+
+    </script>
 </body>
 
 </html>

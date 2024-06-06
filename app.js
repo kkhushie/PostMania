@@ -9,6 +9,7 @@ const app = express();
 const mongoose = require('./config/db'); // Ensure the database connection is established
 const userModel = require("./models/user");
 const postModel = require("./models/post");
+const { formatDistanceToNow } = require('date-fns');
 
 app.set("view engine", "ejs");
 app.use(express.json());
@@ -79,7 +80,6 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", async (req, res) => {
     let { email, password } = req.body;
-    console.log(`Email: ${email}, Password: ${password}`);
 
     try {
         let user = await userModel.findOne({ email });
@@ -123,6 +123,19 @@ app.get('/edit/:id', isLoggedIn, async (req, res) => {
     res.render('edit', { post });
 });
 
+app.get('/delete/:id', isLoggedIn, async (req, res) => {
+        const post = await postModel.findById(req.params.id);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+        let confirmation=confirm("Are you sure?")
+        if(confirmation)
+        await postModel.deleteOne({ _id: req.params.id });
+        res.redirect('/profile')
+    
+});
+
+
 app.get('/like/:id', isLoggedIn, async (req, res) => {
     let post = await postModel.findOne({ _id: req.params.id }).populate('user');
     if (post.likes.indexOf(req.user.userid) === -1) {
@@ -143,7 +156,7 @@ app.post('/update/:id', isLoggedIn, async (req, res) => {
 app.get('/feed', isLoggedIn, async (req, res) => {
     let posts = await postModel.find().populate('user');
     let user = await userModel.findOne({ email: req.user.email });
-    res.render('home', { posts, profile: user });
+    res.render('home', { posts, profile: user,formatDistanceToNow });
 });
 
 app.post('/post', isLoggedIn, async (req, res) => {
