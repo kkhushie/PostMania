@@ -8,7 +8,7 @@ const userSchema = mongoose.Schema({
   password: String,
   profilepic: {
     type: String,
-    default: "default.jpg"
+    default: "./images/uploads/default.jpg"
   },
   posts: [
     { type: mongoose.Schema.Types.ObjectId, ref: "post" }

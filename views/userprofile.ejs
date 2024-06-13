@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostMania</title>
+    <link rel="stylesheet" href="/stylesheets/styles.css">
+    <link rel="stylesheet" href="/stylesheets/profile.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <div class="profile-container w-full min-h-screen bg-zinc-900 p-5 text-white">
+        <div class="top flex gap-4 justify-end p-4 z-70 w-[94%] bg-zinc-900 fixed items-center gap-3 top-0">
+            <button><a href="/feed">Feed</a></button>
+            <h3><a href="/profile" class="text-white">
+                    <div class="w-10 h-10 rounded-[50%] border-[1px] border-zinc-700 overflow-hidden">
+                        <img class="w-full h-full object-cover" src="<%= profile.profilepic %>" />
+                    </div>
+                </a></h3>
+            <button class="border-2 border-blue-500 rounded-md px-2 py-1 text-blue-500"><a
+                    href="/logout">Logout</a></button>
+        </div>
+        <div class=" mt-14">
+            <div class="flex gap-3 items-center">
+                <div class="w-24 h-24 rounded-[50%] border-[1px] border-zinc-700 overflow-hidden">
+                    <img class="w-full h-full object-cover" src="<%= user.profilepic %>"
+                        onerror="this.src='./images/uploads/default.jpg'" alt="User Profile Pic">
+                </div>
+                <div class="flex flex-col">
+                    <h1 class="text-3xl capitalize">
+                        <%= user.name %>
+                    </h1>
+                    <h4 class="text-blue-500 mb-2">@<%= user.username %>
+                    </h4>
+                    <button class="m-0 bg-zinc-700 border-[1px] border-zinc-600 px-3 rounded-md">Follow</button>
+                </div>
+            </div>
+            <div class="posts mt-5">
+                <h3 class="text-zinc-400">All Posts</h3>
+                <div class="postcontainer mt-5">
+                    <% user.posts.reverse().map((post)=> { %>
+                        <div class="post w-1/3 p-4 mb-4 rounded-md bg-zinc-800 border-[1px] border-zinc-700">
+                            <div class="flex gap-2 items-center mb-3">
+                                <div class="w-10 h-10 rounded-[50%] border-[1px] border-zinc-700 overflow-hidden">
+                                    <img class="w-full h-full object-cover" src="<%= user.profilepic %>"
+                                        onerror="this.src='./images/uploads/default.jpg'" alt="User Profile Pic">
+                                </div>
+                                <div class="flex flex-col gap-0">
+
+                                    <h4 class="text-blue-500">@<%= user.username %>
+                                    </h4>
+                                <p class="text-sm text-zinc-500">
+                                    <%= formatDistanceToNow(new Date(post.date), { addSuffix: true }) %>
+                                </p>
+                            </div>
+                            </div>
+                            <p class="text-sm text-white tracking-tight">
+                                <%= post.content %>
+                            </p>
+                            <div class="mt-5 text-sm">
+                                <%= post.likes.length %> Likes
+                            </div>
+                            <div class="btns gap-4 flex">
+                                <a href="/like/<%= post._id %>" class="text-blue-500">
+                                    <%= post.likes.indexOf(profile._id)===-1 ? "Like" : "Unlike" %>
+                                </a>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Any additional scripts you want to include
+    </script>
+</body>
+
+</html>

@@ -4,18 +4,22 @@ const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
-const upload = require('./config/multerconfig');
+const cloudinaryUpload = require('./config/cloudinary'); // Cloudinary configuration
+const upload=require('./config/multerconfig')
 const app = express();
 const mongoose = require('./config/db'); // Ensure the database connection is established
 const userModel = require("./models/user");
 const postModel = require("./models/post");
 const { formatDistanceToNow } = require('date-fns');
 
+
 app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
+
+
 
 let isLoggedIn = (req, res, next) => {
     if (!req.cookies.token) {
@@ -41,16 +45,33 @@ app.get("/profile/upload", (req, res) => {
 });
 
 app.post("/upload", isLoggedIn, upload.single('image'), async (req, res) => {
-    if (!req.file) {
-        console.log("No file received");
-        return res.status(400).send("No file received");
+    try {
+        console.log(req.file); // Log the received file object
+
+        if (!req.file || Object.keys(req.file).length === 0) {
+            console.log("No file received");
+            return res.status(400).send("No file received");
+        }
+
+        // Upload file to Cloudinary (assuming cloudinaryUpload handles this)
+        const cloudinaryResult = await cloudinaryUpload(req.file);
+
+        if (!cloudinaryResult || !cloudinaryResult.secure_url) {
+            throw new Error("Cloudinary upload failed or returned invalid response");
+        }
+
+        // Update user's profile pic in database (assuming you have a user model)
+        let user = await userModel.findOne({ email: req.user.email });
+        user.profilepic = cloudinaryResult.secure_url;
+        await user.save();
+
+        res.redirect('/profile');
+    } catch (error) {
+        console.error("Error uploading file to Cloudinary:", error);
+        res.status(500).send("Error uploading file");
     }
-    let user = await userModel.findOne({ email: req.user.email });
-    user.profilepic = req.file.filename;
-    console.log(req.file);
-    await user.save();
-    res.redirect('/profile');
 });
+
 
 app.get("/login", (req, res) => {
     res.render('login');
@@ -112,10 +133,18 @@ app.get("/logout", (req, res) => {
     res.cookie("token", "");
     res.redirect("/login");
 });
-
-app.get('/profile/', isLoggedIn, async (req, res) => {
-    let user = await userModel.findOne({ email: req.user.email }).populate('posts');
-    res.render('profile', { user });
+// Assuming this is where you fetch the user data before rendering the profile page
+app.get('/profile', isLoggedIn, async (req, res) => {
+    try {
+        let user = await userModel.findOne({ email: req.user.email }).populate('posts');
+        if (!user) {
+            return res.status(404).render('error', { message: 'User not found' });
+        }
+        res.render('profile', { user, formatDistanceToNow });
+    } catch (error) {
+        console.error('Error finding user:', error);
+        res.status(500).render('error', { message: 'Internal Server Error' });
+    }
 });
 
 app.get('/edit/:id', isLoggedIn, async (req, res) => {
@@ -124,17 +153,19 @@ app.get('/edit/:id', isLoggedIn, async (req, res) => {
 });
 
 app.get('/delete/:id', isLoggedIn, async (req, res) => {
+    try {
         const post = await postModel.findById(req.params.id);
         if (!post) {
-            return res.status(404).json({ message: 'Post not found' });
+                res.redirect('/profile')
         }
-        let confirmation=confirm("Are you sure?")
-        if(confirmation)
         await postModel.deleteOne({ _id: req.params.id });
-        res.redirect('/profile')
-    
-});
 
+        res.redirect('/profile');
+    } catch (error) {
+        console.error('Error deleting post:', error);
+        res.redirect('/profile')
+    }
+});
 
 app.get('/like/:id', isLoggedIn, async (req, res) => {
     let post = await postModel.findOne({ _id: req.params.id }).populate('user');
@@ -152,12 +183,28 @@ app.post('/update/:id', isLoggedIn, async (req, res) => {
     let post = await postModel.findOneAndUpdate({ _id: req.params.id }, { content: req.body.content });
     res.redirect('/feed');
 });
-
 app.get('/feed', isLoggedIn, async (req, res) => {
     let posts = await postModel.find().populate('user');
     let user = await userModel.findOne({ email: req.user.email });
-    res.render('home', { posts, profile: user,formatDistanceToNow });
+    res.render('home', { posts, profile: user, formatDistanceToNow });
 });
+
+app.get('/user/:username',isLoggedIn, async (req, res) => {
+    try {
+
+        let user = await userModel.findOne({ username: req.params.username }).populate('posts');;
+        if (!user) {
+            return res.status(404).render('error', { message: 'User not found' });
+        }
+        let userprofile = await userModel.findOne({ email: req.user.email });
+
+        res.render('userprofile', { user ,profile: userprofile,formatDistanceToNow });
+    } catch (error) {
+        console.error('Error finding user:', error);
+        res.status(500).render('error', { message: 'Internal Server Error' });
+    }
+});
+
 
 app.post('/post', isLoggedIn, async (req, res) => {
     let user = await userModel.findOne({ email: req.user.email });

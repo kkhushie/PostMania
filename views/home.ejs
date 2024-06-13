@@ -16,7 +16,7 @@
         <div class="flex justify-end p-4 z-70 w-[94%] bg-zinc-900 fixed items-center gap-3 top-0">
             <h3><a href="/profile" class="text-white">
                     <div class="w-10 h-10 rounded-[50%] border-[1px] border-zinc-700 overflow-hidden">
-                            <img class="w-full h-full object-cover" src="/images/uploads/<%= profile.profilepic %>">
+                            <img class="w-full h-full object-cover" src="<%= profile.profilepic %>" onerror="this.src='./images/uploads/default.jpg'">
                     </div>
             </h3>
             <button class="border-2 border-blue-500 rounded-md px-2 py-1 text-blue-500"><a
@@ -29,11 +29,11 @@
                     <div class="post w-1/3 p-4 mb-4 rounded-md bg-zinc-800 border-[1px] border-zinc-700">
                         <div class="flex gap-2 items-center mb-3">
                             <div class="w-10 h-10 rounded-[50%] border-[1px] border-zinc-700 overflow-hidden">
-                                <img class="w-full h-full object-cover" src="/images/uploads/<%=post.user.profilepic %>"
+                                <img class="w-full h-full object-cover" src="<%=post.user.profilepic %>" onerror="this.src='./images/uploads/default.jpg'"
                                     alt="img">
                             </div>
                             <div class=" flex flex-col gap-0">
-                                <h4 class="text-blue-500">@<%= post.user.username%>
+                                <h4 class="text-blue-500 curser-pointer"><a href="/user/<%= post.user.username%>">@<%= post.user.username%></a>
                                 </h4>
                                 <p class=" text-sm text-zinc-500"><%= formatDistanceToNow(new Date(post.date), { addSuffix: true }) %></p>
                             </div>
@@ -42,9 +42,6 @@
                         <p class="text-sm tracking-tight">
                             <%= post.content %>
                         </p>
-                        <div>
-                            <img src="" alt="">
-                        </div>
                         <div class="mt-5 text-sm">
                             <%= post.likes.length%> Likes
                         </div>
