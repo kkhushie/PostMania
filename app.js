@@ -218,6 +218,15 @@ app.post('/post', isLoggedIn, async (req, res) => {
     res.redirect('/profile');
 });
 
+app.get('/api/users',async (re,res)=>{
+    let users=await userModel.find()
+    res.send(users)
+})
+app.get('/api/posts',async (re,res)=>{
+    let posts=await postModel.find()
+    res.send(posts)
+})
+
 app.listen(3000, () => {
     console.log("server is running");
 });
