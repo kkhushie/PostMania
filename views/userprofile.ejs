@@ -2,41 +2,96 @@
 <html lang="en">
 
 <head>
+    <!-- Meta tags and title -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PostMania</title>
+
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="/stylesheets/styles.css">
     <link rel="stylesheet" href="/stylesheets/profile.css">
+    <style>
+        .verified-icon {
+            margin-left: 3px;
+            /* Adjust the margin as needed */
+        }
+        .verified-icon-sm {
+            margin-left: 3px;
+            /* Adjust the margin as needed */
+        }
+
+        .verified-svg-sm {
+            fill: #234bff;
+
+            /* Fill color of the SVG icon */
+            width: 18px;
+            /* Width of the SVG icon */
+            height: 18px;
+            /* Height of the SVG icon */
+        }
+        .verified-svg {
+            fill: #234bff;
+
+            /* Fill color of the SVG icon */
+            width: 25px;
+            /* Width of the SVG icon */
+            height: 25px;
+            /* Height of the SVG icon */
+        }
+    </style>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body>
+    <!-- Profile Container -->
     <div class="profile-container w-full min-h-screen bg-zinc-900 p-5 text-white">
+        <!-- Top Bar -->
         <div class="top flex gap-4 justify-end p-4 z-70 w-[94%] bg-zinc-900 fixed items-center gap-3 top-0">
             <button><a href="/feed">Feed</a></button>
             <h3><a href="/profile" class="text-white">
                     <div class="w-10 h-10 rounded-[50%] border-[1px] border-zinc-700 overflow-hidden">
-                        <img class="w-full h-full object-cover" src="<%= profile.profilepic %>" />
+                        <img class="w-full h-full object-cover" src="<%= profile.profilepic %>"
+                            onerror="this.src='/images/uploads/default.jpg'" />
                     </div>
                 </a></h3>
             <button class="border-2 border-blue-500 rounded-md px-2 py-1 text-blue-500"><a
                     href="/logout">Logout</a></button>
         </div>
-        <div class=" mt-14">
+
+        <!-- User Information -->
+        <div class="mt-14">
             <div class="flex gap-3 items-center">
-                <div class="w-24 h-24 rounded-[50%] border-[1px] border-zinc-700 overflow-hidden">
+                <div class="w-24 h-24 rounded-full border-2 border-zinc-700 overflow-hidden">
                     <img class="w-full h-full object-cover" src="<%= user.profilepic %>"
-                        onerror="this.src='./images/uploads/default.jpg'" alt="User Profile Pic">
+                        onerror="this.src='/images/uploads/default.jpg'" alt="Profile Picture" />
                 </div>
                 <div class="flex flex-col">
-                    <h1 class="text-3xl capitalize">
-                        <%= user.name %>
-                    </h1>
+                    <div class="flex items-center">
+                        <h1 class="text-3xl capitalize flex items-center justify-center">
+                            <%= user.name %>
+                                <% if (user.name==="Owner" ) { %>
+                                    <span class="verified-icon ">
+                                        <svg viewBox="0 0 22 22" aria-label="Verified account" role="img"
+                                            class="verified-svg">
+                                            <g>
+                                                <path
+                                                    d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z">
+                                                </path>
+                                            </g>
+                                        </svg>
+                                    </span>
+                                    <% } %>
+                        </h1>
+                    </div>
                     <h4 class="text-blue-500 mb-2">@<%= user.username %>
                     </h4>
-                    <button class="m-0 bg-zinc-700 border-[1px] border-zinc-600 px-3 rounded-md">Follow</button>
+                    <button class="m-0 bg-zinc-700 border-2 border-zinc-600 px-3 rounded-md">Follow</button>
                 </div>
             </div>
+
+
+            <!-- User Posts -->
             <div class="posts mt-5">
                 <h3 class="text-zinc-400">All Posts</h3>
                 <div class="postcontainer mt-5">
@@ -45,25 +100,36 @@
                             <div class="flex gap-2 items-center mb-3">
                                 <div class="w-10 h-10 rounded-[50%] border-[1px] border-zinc-700 overflow-hidden">
                                     <img class="w-full h-full object-cover" src="<%= user.profilepic %>"
-                                        onerror="this.src='./images/uploads/default.jpg'" alt="User Profile Pic">
+                                        onerror="this.src='/images/uploads/default.jpg'" alt="Profile">
                                 </div>
                                 <div class="flex flex-col gap-0">
-
-                                    <h4 class="text-blue-500">@<%= user.username %>
-                                    </h4>
-                                <p class="text-sm text-zinc-500">
-                                    <%= formatDistanceToNow(new Date(post.date), { addSuffix: true }) %>
-                                </p>
+                                    <h4 class="text-blue-500 flex items-center">@<%= user.username %>
+                                    
+                                        <% if (user.name==="Owner" ) { %>
+                                            <span class="verified-icon-sm ">
+                                                <svg viewBox="0 0 22 22" aria-label="Verified account" role="img"
+                                                    class="verified-svg-sm">
+                                                    <g>
+                                                        <path
+                                                            d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z">
+                                                        </path>
+                                                    </g>
+                                                </svg>
+                                            </span>
+                                            <% } %></h4>
+                                    <p class="text-sm text-zinc-500">
+                                        <%= formatDistanceToNow(new Date(post.date), { addSuffix: true }) %>
+                                    </p>
+                                </div>
                             </div>
-                            </div>
-                            <p class="text-sm text-white tracking-tight">
+                            <p class="post-content text-sm text-white tracking-tight">
                                 <%= post.content %>
                             </p>
-                            <div class="mt-5 text-sm">
+                            <div class="border-t-[1px] border-t-zinc-700 mt-5 py-3 text-sm">
                                 <%= post.likes.length %> Likes
                             </div>
                             <div class="btns gap-4 flex">
-                                <a href="/like/<%= post._id %>" class="text-blue-500">
+                                <a href="/like/<%= post._id %>" class="text-pink-500">
                                     <%= post.likes.indexOf(profile._id)===-1 ? "Like" : "Unlike" %>
                                 </a>
                             </div>
@@ -73,8 +139,24 @@
             </div>
         </div>
     </div>
+
+    <!-- Script for Mention Highlighting -->
     <script>
-        // Any additional scripts you want to include
+        document.addEventListener('DOMContentLoaded', function () {
+            highlightMentions();
+        });
+
+        function highlightMentions() {
+            const postContents = document.querySelectorAll('.post-content');
+
+            postContents.forEach(content => {
+                const regex = /@(\w+)/g;
+                let html = content.innerHTML;
+
+                html = html.replace(regex, '<a class="text-blue-500 " href="/user/$1">@$1</a>');
+                content.innerHTML = html;
+            });
+        }
     </script>
 </body>
 

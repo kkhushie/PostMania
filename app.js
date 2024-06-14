@@ -5,21 +5,18 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const cloudinaryUpload = require('./config/cloudinary'); // Cloudinary configuration
-const upload=require('./config/multerconfig')
+const upload = require('./config/multerconfig');
 const app = express();
 const mongoose = require('./config/db'); // Ensure the database connection is established
 const userModel = require("./models/user");
 const postModel = require("./models/post");
 const { formatDistanceToNow } = require('date-fns');
 
-
 app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
-
-
 
 let isLoggedIn = (req, res, next) => {
     if (!req.cookies.token) {
@@ -48,19 +45,19 @@ app.post("/upload", isLoggedIn, upload.single('image'), async (req, res) => {
     try {
         console.log(req.file); // Log the received file object
 
-        if (!req.file || Object.keys(req.file).length === 0) {
+        if (!req.file) {
             console.log("No file received");
-            return res.status(400).send("No file received");
+            return res.status(400).send("No file received or invalid file type");
         }
 
-        // Upload file to Cloudinary (assuming cloudinaryUpload handles this)
+        // Upload file to Cloudinary
         const cloudinaryResult = await cloudinaryUpload(req.file);
 
         if (!cloudinaryResult || !cloudinaryResult.secure_url) {
             throw new Error("Cloudinary upload failed or returned invalid response");
         }
 
-        // Update user's profile pic in database (assuming you have a user model)
+        // Update user's profile pic in the database
         let user = await userModel.findOne({ email: req.user.email });
         user.profilepic = cloudinaryResult.secure_url;
         await user.save();
@@ -72,48 +69,54 @@ app.post("/upload", isLoggedIn, upload.single('image'), async (req, res) => {
     }
 });
 
-
 app.get("/login", (req, res) => {
     res.render('login');
 });
 
 app.post("/register", async (req, res) => {
-    let { username, name, age, email, password } = req.body;
-    let user = await userModel.findOne({ email });
-    if (user) return res.status(500).send("User already registered");
+    try {
+        let { username, name, age, email, password } = req.body;
+        let user = await userModel.findOne({ email });
+        if (user) return res.status(400).send("User already registered");
 
-    bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(password, salt, async (err, hash) => {
-            user = await userModel.create({
-                username: username,
-                name: name,
-                age: age,
-                email: email,
-                password: hash
+        bcrypt.genSalt(10, (err, salt) => {
+            if (err) throw err;
+
+            bcrypt.hash(password, salt, async (err, hash) => {
+                if (err) throw err;
+
+                user = await userModel.create({
+                    username: username,
+                    name: name,
+                    age: age,
+                    email: email,
+                    password: hash
+                });
+
+                let token = jwt.sign({ email: email, userid: user._id }, process.env.JWT_SECRET);
+                res.cookie("token", token, { secure: true, httpOnly: true });
+                res.redirect("/feed");
             });
-
-            let token = jwt.sign({ email: email, userid: user._id }, process.env.JWT_SECRET);
-            res.cookie("token", token, { secure: true, httpOnly: true });
-            res.redirect("/feed");
         });
-    });
+    } catch (error) {
+        console.error("Error during registration:", error);
+        res.status(500).send("Internal Server Error");
+    }
 });
 
 app.post("/login", async (req, res) => {
-    let { email, password } = req.body;
-
     try {
+        let { email, password } = req.body;
         let user = await userModel.findOne({ email });
+
         if (!user) {
             console.log('User not found');
             return res.redirect('/login');
         }
 
         bcrypt.compare(password, user.password, (err, result) => {
-            if (err) {
-                console.error('Error comparing passwords', err);
-                return res.redirect('/login');
-            }
+            if (err) throw err;
+
             if (result) {
                 let token = jwt.sign({ email: email, userid: user._id }, process.env.JWT_SECRET);
                 res.cookie("token", token, { secure: false, httpOnly: true }); // Set secure to true if using HTTPS
@@ -133,7 +136,7 @@ app.get("/logout", (req, res) => {
     res.cookie("token", "");
     res.redirect("/login");
 });
-// Assuming this is where you fetch the user data before rendering the profile page
+
 app.get('/profile', isLoggedIn, async (req, res) => {
     try {
         let user = await userModel.findOne({ email: req.user.email }).populate('posts');
@@ -148,84 +151,117 @@ app.get('/profile', isLoggedIn, async (req, res) => {
 });
 
 app.get('/edit/:id', isLoggedIn, async (req, res) => {
-    let post = await postModel.findOne({ _id: req.params.id }).populate('user');
-    res.render('edit', { post });
+    try {
+        let post = await postModel.findOne({ _id: req.params.id }).populate('user');
+        res.render('edit', { post });
+    } catch (error) {
+        console.error('Error fetching post:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 app.get('/delete/:id', isLoggedIn, async (req, res) => {
     try {
         const post = await postModel.findById(req.params.id);
         if (!post) {
-                res.redirect('/profile')
+            return res.redirect('/profile');
         }
         await postModel.deleteOne({ _id: req.params.id });
-
         res.redirect('/profile');
     } catch (error) {
         console.error('Error deleting post:', error);
-        res.redirect('/profile')
+        res.redirect('/profile');
     }
 });
 
 app.get('/like/:id', isLoggedIn, async (req, res) => {
-    let post = await postModel.findOne({ _id: req.params.id }).populate('user');
-    if (post.likes.indexOf(req.user.userid) === -1) {
-        post.likes.push(req.user.userid);
-    } else {
-        post.likes.splice(post.likes.indexOf(req.user.userid), 1);
-    }
+    try {
+        let post = await postModel.findOne({ _id: req.params.id }).populate('user');
+        if (post.likes.indexOf(req.user.userid) === -1) {
+            post.likes.push(req.user.userid);
+        } else {
+            post.likes.splice(post.likes.indexOf(req.user.userid), 1);
+        }
 
-    await post.save();
-    res.redirect('/feed');
+        await post.save();
+        res.redirect('/feed');
+    } catch (error) {
+        console.error('Error liking post:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 app.post('/update/:id', isLoggedIn, async (req, res) => {
-    let post = await postModel.findOneAndUpdate({ _id: req.params.id }, { content: req.body.content });
-    res.redirect('/feed');
-});
-app.get('/feed', isLoggedIn, async (req, res) => {
-    let posts = await postModel.find().populate('user');
-    let user = await userModel.findOne({ email: req.user.email });
-    res.render('home', { posts, profile: user, formatDistanceToNow });
-});
-
-app.get('/user/:username',isLoggedIn, async (req, res) => {
     try {
+        await postModel.findOneAndUpdate({ _id: req.params.id }, { content: req.body.content });
+        res.redirect('/feed');
+    } catch (error) {
+        console.error('Error updating post:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
-        let user = await userModel.findOne({ username: req.params.username }).populate('posts');;
+app.get('/feed', isLoggedIn, async (req, res) => {
+    try {
+        let posts = await postModel.find().populate('user');
+        let user = await userModel.findOne({ email: req.user.email });
+        res.render('home', { posts, profile: user, formatDistanceToNow });
+    } catch (error) {
+        console.error('Error fetching feed:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.get('/user/:username', isLoggedIn, async (req, res) => {
+    try {
+        let user = await userModel.findOne({ username: req.params.username }).populate('posts');
         if (!user) {
             return res.status(404).render('error', { message: 'User not found' });
         }
         let userprofile = await userModel.findOne({ email: req.user.email });
-
-        res.render('userprofile', { user ,profile: userprofile,formatDistanceToNow });
+        res.render('userprofile', { user, profile: userprofile, formatDistanceToNow });
     } catch (error) {
         console.error('Error finding user:', error);
         res.status(500).render('error', { message: 'Internal Server Error' });
     }
 });
 
-
 app.post('/post', isLoggedIn, async (req, res) => {
-    let user = await userModel.findOne({ email: req.user.email });
-    let { content } = req.body;
-    let post = await postModel.create({
-        user: user._id,
-        content
-    });
-    user.posts.push(post._id);
-    await user.save();
-    res.redirect('/profile');
+    try {
+        let user = await userModel.findOne({ email: req.user.email });
+        let { content } = req.body;
+        let post = await postModel.create({
+            user: user._id,
+            content
+        });
+        user.posts.push(post._id);
+        await user.save();
+        res.redirect('/profile');
+    } catch (error) {
+        console.error('Error creating post:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
-app.get('/api/users',async (re,res)=>{
-    let users=await userModel.find()
-    res.send(users)
-})
-app.get('/api/posts',async (re,res)=>{
-    let posts=await postModel.find()
-    res.send(posts)
-})
+app.get('/api/users', async (req, res) => {
+    try {
+        let users = await userModel.find();
+        res.send(users);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.get('/api/posts', async (req, res) => {
+    try {
+        let posts = await postModel.find();
+        res.send(posts);
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 app.listen(3000, () => {
     console.log("server is running");

@@ -18,3 +18,23 @@ function timeAgo(timestamp) {
         return 'just now';
     }
 }
+// feed.js
+document.addEventListener('DOMContentLoaded', function() {
+    highlightMentions();
+});
+
+function highlightMentions() {
+    const postContents = document.querySelectorAll('.post-content');
+
+    postContents.forEach(content => {
+        // Regular expression to find mentions (words starting with @)
+        const regex = /@(\w+)/g;
+        let html = content.innerHTML;
+
+        // Replace mentions with anchor tags for linking to user profiles
+        html = html.replace(regex, '<a class="text-blue-500" href="/user/$1">@$1</a>');
+        content.innerHTML = html;
+    });
+}
+
+  
