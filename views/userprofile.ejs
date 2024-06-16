@@ -95,7 +95,7 @@
                                     <% } %>
                         </h1>
                     </div>
-                    <h4 class="text-blue-500 mb-2">@<%= user.username %>
+                    <h4 class="text-blue-500 mb-2 lowercase">@<%= user.username %>
                     </h4>
                     <button class="m-0 bg-zinc-700 border-2 border-zinc-600 px-3 rounded-md">Follow</button>
                 </div>
@@ -118,7 +118,7 @@
                                                 onerror="this.src='/images/uploads/default.jpg'" alt="Profile">
                                         </div>
                                         <div class="flex flex-col gap-0">
-                                            <h4 class="text-blue-500 flex items-center">@<%= user.username %>
+                                            <h4 class="text-blue-500 flex items-center lowercase">@<%= user.username %>
 
                                                     <% if (user.name==="Owner" ) { %>
                                                         <span class="verified-icon-sm ">
@@ -187,18 +187,27 @@
         document.addEventListener('DOMContentLoaded', function () {
             highlightMentions();
         });
-
         function highlightMentions() {
             const postContents = document.querySelectorAll('.post-content');
 
             postContents.forEach(content => {
-                const regex = /@(\w+)/g;
+                // Regular expression to find mentions (words starting with @)
+                const mentionRegex = /@(\w+)/g;
+                // Regular expression to find URLs
+                const urlRegex = /(https?:\/\/[^\s]+)/g;
+
                 let html = content.innerHTML;
 
-                html = html.replace(regex, '<a class="text-blue-500 " href="/user/$1">@$1</a>');
+                // Replace mentions with anchor tags for linking to user profiles
+                html = html.replace(mentionRegex, '<a class="text-blue-500" href="/user/$1">@$1</a>');
+
+                // Replace URLs with anchor tags for clickable links
+                html = html.replace(urlRegex, '<a class="text-blue-500" href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+
                 content.innerHTML = html;
             });
         }
+
     </script>
 </body>
 

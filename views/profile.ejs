@@ -118,7 +118,8 @@
                                 </div>
                                 <div class="flex flex-col gap-0">
 
-                                    <h4 class="text-blue-500 flex justify-center items-center">@<%= user.username %>
+                                    <h4 class="text-blue-500 flex justify-center lowercase items-center">@<%=
+                                            user.username %>
                                             <% if (user.username==="owner" ) { %>
                                                 <span class="verified-icon ">
                                                     <svg viewBox="0 0 22 22" aria-label="Verified account" role="img"
@@ -196,11 +197,18 @@
 
             postContents.forEach(content => {
                 // Regular expression to find mentions (words starting with @)
-                const regex = /@(\w+)/g;
+                const mentionRegex = /@(\w+)/g;
+                // Regular expression to find URLs
+                const urlRegex = /(https?:\/\/[^\s]+)/g;
+
                 let html = content.innerHTML;
 
                 // Replace mentions with anchor tags for linking to user profiles
-                html = html.replace(regex, '<a class="text-blue-500" href="/user/$1">@$1</a>');
+                html = html.replace(mentionRegex, '<a class="text-blue-500" href="/user/$1">@$1</a>');
+
+                // Replace URLs with anchor tags for clickable links
+                html = html.replace(urlRegex, '<a class="text-blue-500" href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+
                 content.innerHTML = html;
             });
         }
