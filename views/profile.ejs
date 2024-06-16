@@ -30,105 +30,198 @@
             height: 18px;
             /* Height of the SVG icon */
         }
+
+        .post-success-popup {
+            animation: slideInFromBottom 0.5s ease-in-out;
+        }
+
+        @keyframes slideInFromBottom {
+            0% {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="profile-container w-full min-h-screen bg-zinc-900 p-5 text-white">
-        <div class="top flex justify-end items-center w-[94%] fixed gap-3 px-2">
-           <% if(user.username=="owner") {%>
-           <a href="/users/data">Manage</a>
-           <%  }%>
-            <button><a href="/feed">Feed</a></button>
-            <button class="border-2 border-blue-500 rounded-md px-2 py-1 text-blue-500"><a href="/logout">Logout</a></button>
+
+
+        <div
+            class="top Z-70 flex justify-between items-center w-[94%] bg-zinc-900 fixed gap-3 p-4 z-70 w-[94%] bg-zinc-900 fixed items-center gap-3 top-0">
+            <svg class="" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 64 64"
+                xml:space="preserve">
+                <path fill-rule="evenodd" clip-rule="evenodd" fill="#3B82F6"
+                    d="M20 34a2 2 0 1 1-3.999.001A2 2 0 0 1 20 34zm12 30a31.84 31.84 0 0 1-12.55-2.579A5.99 5.99 0 0 1 16 56V45.047A5.047 5.047 0 0 1 21.047 40c1.212 0 2.322.432 3.195 1.146A11.937 11.937 0 0 0 32 44c6.628 0 12-5.372 12-12s-5.372-12-12-12c-4.797 0-8.924 2.822-10.846 6.89l-.021-.012A1.998 1.998 0 0 1 19.343 28a2 2 0 0 1-2-2c0-.432.141-.829.374-1.154C20.344 19.607 25.741 16 32 16c8.836 0 16 7.164 16 16s-7.164 16-16 16c-3.922 0-7.486-1.442-10.262-3.794.002.024-.002.034-.02.021a1.062 1.062 0 0 0-1.718.835V56c0 .749.424 1.384 1.033 1.727A27.67 27.67 0 0 0 32 60c15.465 0 28-12.536 28-28S47.465 4 32 4C16.536 4 4 16.536 4 32v30a2 2 0 1 1-4 0V32C0 14.327 14.327 0 32 0s32 14.327 32 32-14.327 32-32 32z" />
+            </svg>
+
+            <div class=" flex gap-4 items-center justify-center">
+
+                <% if(user.username=="owner" ) {%>
+                    <a href="/users/data" class=" text-blue-500">Manage</a>
+                    <% }%>
+                        <button><a href="/feed">Feed</a></button>
+                        <button class="border-2 border-blue-500 rounded-md px-2 py-1 text-blue-500"><a
+                                href="/logout">Logout</a></button>
+            </div>
         </div>
-        <div class="mt-14">
+        <div id="postdeletePopup" class=" fixed top-30 z-550 flex hidden post-success-popup justify-center m-0 w-[90%]">
+
+            <div class="bg-zinc-800 text-white px-3 py-2 rounded-md shadow-lg">
+                Post deleted successfully! 🎉
+            </div>
+        </div>
+        <div id="postSuccessPopup"
+            class=" fixed top-5 z-150 flex post-success-popup hidden  justify-center m-0 w-[90%]">
+
+            <div class="bg-zinc-800 text-white px-4 py-2 rounded-md shadow-lg">
+                Post created successfully!
+            </div>
+        </div>
+        <div class="mt-20 Z-20">
             <div class="flex gap-3">
-                <div class="w-10 h-10 rounded-[50%] border-[1px] border-zinc-700">
+                <div class="w-10 h-10 Z-10 rounded-[50%] border-[1px] border-zinc-700">
                     <a href="/profile/upload" class="relative">
-                        <img class="w-full h-full object-cover rounded-[50%]" onerror="this.src='./images/uploads/default.jpg'" src="<%= user.profilepic %>" alt="Profile Picture">
-                        <span class="absolute bottom-[-11%] right-0 bg-blue-500 text-center text-sm flex items-center justify-center w-3 h-3 text-white rounded-[50%] border-[2px] p-2 border-zinc-900">+</span>
+                        <img class="w-full h-full object-cover rounded-[50%]"
+                            onerror="this.src='./images/uploads/default.jpg'" src="<%= user.profilepic %>"
+                            alt="Profile Picture">
+                        <span
+                            class="absolute bottom-[-11%] right-0 bg-blue-500 text-center text-sm flex items-center justify-center w-3 h-3 text-white rounded-[50%] border-[2px] p-2 border-zinc-900">+</span>
                     </a>
                 </div>
                 <h1 class="text-3xl font-semibold"><span class="font-light">Hello</span>, <%= user.name %>👋</h1>
             </div>
             <h5 class="my-5">You can create a new post.</h5>
-            <form action="/post" method="post">
+            <form action="/post" method="post" onsubmit="showPostSuccessPopup()">
                 <textarea name="content" required placeholder="What's on your mind?"
                     class="w-1/3 p-3 resize-none bg-transparent outline-none border-2 rounded-md border-zinc-800 block"></textarea>
-                <input class="submit-btn px-3 w-40 py-1 bg-blue-500 block rounded-md mt-2" value="Create Post" type="submit">
+                <input class="submit-btn px-3 w-40 py-1 bg-blue-500 block rounded-md mt-2 cursor-pointer"
+                    value="Create Post" type="submit" />
             </form>
             <div class="posts mt-20">
                 <h3 class="text-zinc-400">Your Posts</h3>
                 <div class="postcontainer mt-5" id="postContainer">
-                    <% user.posts.reverse().forEach((post) => { %>
+                    <% user.posts.reverse().forEach((post)=> { %>
                         <div class="post w-1/3 p-4 mb-4 rounded-md bg-zinc-800 border-[1px] border-zinc-700">
                             <div class="flex gap-2 items-center mb-3">
-                                <div class="w-8 h-8 rounded-[50%] border-[1px] border-zinc-700 overflow-hidden">
-                                    <img class="w-full h-full object-cover" src="<%= user.profilepic %>" onerror="this.src='./images/uploads/default.jpg'" alt="img">
+                                <div class="w-10 h-10 rounded-[50%] border-[1px] border-zinc-700 overflow-hidden">
+                                    <img class="w-full h-full object-cover" src="<%= user.profilepic %>"
+                                        onerror="this.src='./images/uploads/default.jpg'" alt="img">
                                 </div>
-                                <h4 class="text-blue-500 mb-2 flex justify-center items-center">@<%= user.username %>
-                                    <% if (user.username==="owner" ) { %>
-                                        <span class="verified-icon ">
-                                            <svg viewBox="0 0 22 22" aria-label="Verified account" role="img"
-                                                class="verified-svg">
-                                                <g>
-                                                    <path
-                                                        d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z">
-                                                    </path>
-                                                </g>
-                                            </svg>
-                                        </span>
-                                        <% } %></h4>
+                                <div class="flex flex-col gap-0">
+
+                                    <h4 class="text-blue-500 flex justify-center items-center">@<%= user.username %>
+                                            <% if (user.username==="owner" ) { %>
+                                                <span class="verified-icon ">
+                                                    <svg viewBox="0 0 22 22" aria-label="Verified account" role="img"
+                                                        class="verified-svg">
+                                                        <g>
+                                                            <path
+                                                                d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z">
+                                                            </path>
+                                                        </g>
+                                                    </svg>
+                                                </span>
+                                                <% } %>
+                                    </h4>
+                                    <p class="text-sm text-zinc-500">
+                                        <%= formatDistanceToNow(new Date(post.date), { addSuffix: true }) %>
+                                    </p>
+                                </div>
                             </div>
                             <p class="text-sm tracking-tight post-content">
                                 <%= post.content %>
                             </p>
-                            <div class="border-t-[1px] flex justify-between items-center border-t-zinc-700 mt-5 py-3 text-sm">
-                               <h3> <%= post.likes.length %> Likes</h3>
-                               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                                <path d="M15 12c0 1.654-1.346 3-3 3s-3-1.346-3-3 1.346-3 3-3 3 1.346 3 3zm9-.449s-4.252 8.449-11.985 8.449c-7.18 0-12.015-8.449-12.015-8.449s4.446-7.551 12.015-7.551c7.694 0 11.985 7.551 11.985 7.551zm-7 .449c0-2.757-2.243-5-5-5s-5 2.243-5 5 2.243 5 5 5 5-2.243 5-5z" fill="#ffffff"/>
-                            </svg>
-                            
-                            </div>
-                            <div class="btns justify-between gap-4 mt-1 flex">
-                                <div class=" flex gap-3">
-
+                            <div
+                                class="border-t-[1px] flex justify-between items-center border-t-zinc-700 mt-5 py-3 text-sm">
+                                <div class="flex justify-center gap-2 items-center">
                                     <a href="/like/<%= post._id %>" class="text-pink-500">
-                                        <%= (post.likes.indexOf(user._id) === -1) ? "Like" : "Unlike" %>
+                                        <%if( post.likes.indexOf(user._id)===-1 ){%>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                viewBox="0 0 24 24">
+                                                <path
+                                                    d="M12 9.229c.234-1.12 1.547-6.229 5.382-6.229 2.22 0 4.618 1.551 4.618 5.003 0 3.907-3.627 8.47-10 12.629-6.373-4.159-10-8.722-10-12.629 0-3.484 2.369-5.005 4.577-5.005 3.923 0 5.145 5.126 5.423 6.231zm-12-1.226c0 4.068 3.06 9.481 12 14.997 8.94-5.516 12-10.929 12-14.997 0-7.962-9.648-9.028-12-3.737-2.338-5.262-12-4.27-12 3.737z"
+                                                    fill="crimson" />
+                                            </svg>
+                                            <%}else{%>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                    viewBox="0 0 24 24" fill="crimson">
+                                                    <path
+                                                        d="M12 4.435c-1.989-5.399-12-4.597-12 3.568 0 4.068 3.06 9.481 12 14.997 8.94-5.516 12-10.929 12-14.997 0-8.118-10-8.999-12-3.568z" />
+                                                </svg>
+                                                <%}%>
+
                                     </a>
-                                <a href="/edit/<%= post._id %>" class="text-zinc-600">edit</a>
+                                    <span class="h-1 w-1 bg-zinc-700 rounded-full"></span>
+                                    <h3>
+                                        <%= post.likes.length %> Likes
+                                    </h3>
                                 </div>
-                                
-                                <a href="/delete/<%= post._id %>" onclick='confirmDeletion("<%= post._id %>")' class="text-red-500 delete-btn">Delete</a>
+                                <a href="/likes/<%= post._id %>">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                                        <path
+                                            d="M15 12c0 1.654-1.346 3-3 3s-3-1.346-3-3 1.346-3 3-3 3 1.346 3 3zm9-.449s-4.252 8.449-11.985 8.449c-7.18 0-12.015-8.449-12.015-8.449s4.446-7.551 12.015-7.551c7.694 0 11.985 7.551 11.985 7.551zm-7 .449c0-2.757-2.243-5-5-5s-5 2.243-5 5 2.243 5 5 5 5-2.243 5-5z"
+                                            fill="#ffffff" />
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class=" flex items-center justify-end gap-3">
+                                <a href="/edit/<%= post._id %>" class="text-zinc-500">edit</a>
+                                <a href="/delete/<%= post._id %>" onclick='showPostDeletePopup()'
+                                    class="text-red-500 delete-btn">Delete</a>
+
                             </div>
                         </div>
-                    <% }) %>
+                        <% }) %>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        
-document.addEventListener('DOMContentLoaded', function() {
-    highlightMentions();
-});
 
-function highlightMentions() {
-    const postContents = document.querySelectorAll('.post-content');
+        document.addEventListener('DOMContentLoaded', function () {
+            highlightMentions();
+        });
 
-    postContents.forEach(content => {
-        // Regular expression to find mentions (words starting with @)
-        const regex = /@(\w+)/g;
-        let html = content.innerHTML;
+        function highlightMentions() {
+            const postContents = document.querySelectorAll('.post-content');
 
-        // Replace mentions with anchor tags for linking to user profiles
-        html = html.replace(regex, '<a class="text-blue-500" href="/user/$1">@$1</a>');
-        content.innerHTML = html;
-    });
-}
+            postContents.forEach(content => {
+                // Regular expression to find mentions (words starting with @)
+                const regex = /@(\w+)/g;
+                let html = content.innerHTML;
 
-   </script>
+                // Replace mentions with anchor tags for linking to user profiles
+                html = html.replace(regex, '<a class="text-blue-500" href="/user/$1">@$1</a>');
+                content.innerHTML = html;
+            });
+        }
+
+        // Function to show the success popup
+        function showPostSuccessPopup() {
+            const popup = document.getElementById('postSuccessPopup');
+            popup.classList.remove('hidden'); // Remove the 'hidden' class to show the popup
+            setTimeout(() => {
+                popup.classList.add('hidden'); // Hide the popup after a few seconds (optional)
+            }, 3000); // Adjust the timeout value (in milliseconds) as needed
+        }
+        function showPostDeletePopup() {
+            const popup = document.getElementById('postdeletePopup');
+            popup.classList.remove('hidden'); // Remove the 'hidden' class to show the popup
+            setTimeout(() => {
+                popup.classList.add('hidden'); // Hide the popup after a few seconds (optional)
+            }, 3000); // Adjust the timeout value (in milliseconds) as needed
+        }
+
+    </script>
 </body>
 
 </html>
