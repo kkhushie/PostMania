@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Likes</title>
+    <link rel="stylesheet" href="/stylesheets/styles.css">
+    <link rel="stylesheet" href="/stylesheets/profile.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <div class="container w-full min-h-screen bg-zinc-900 p-5 text-white">
+        <h1 class="mb-5 text-3xl">Users who liked the post</h1>
+        <div class="bg-zinc-800 w-full sm:w-3/4 md:w-1/2 px-4  rounded-lg">
+            <% if (likes && likes.length> 0) { %>
+                <% likes.forEach((user)=> { %>
+                    <div class="user border-b-[1px] border-b-zinc-700 flex gap-3 items-center py-3 justify-between">
+                        <div class="flex gap-3 items-center">
+
+                            <div class="w-10 h-10 flex rounded-full border-[1px] border-zinc-700 overflow-hidden">
+                                <img class="w-full h-full object-cover" src="<%= user.profilepic %>"
+                                    onerror="this.src='/images/uploads/default.jpg'" alt="User profile picture">
+                            </div>
+                            <div>
+                                <h4 class="text-white capitalize"><a href="/user/<%= user.username %>">
+                                        <%= user.name %>
+                                    </a></h4>
+                                <p class="text-blue-500">@<%= user.username %>
+                                </p>
+                            </div>
+                            
+                        </div>
+                        <svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="25" height="25">
+                                <path
+                                    d="m12 5.72c-2.624-4.517-10-3.198-10 2.461 0 3.725 4.345 7.727 9.303 12.54.194.189.446.283.697.283s.503-.094.697-.283c4.977-4.831 9.303-8.814 9.303-12.54 0-5.678-7.396-6.944-10-2.461z"
+                                    fill-rule="nonzero" fill="red" />
+                            </svg>
+                    </div>
+                    <% }) %>
+                        <% } else { %>
+                            <p>No likes yet.</p>
+                            <% } %>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -71,9 +71,17 @@
                         <p class="post-content tracking-tight">
                             <%= post.content %>
                         </p>
-                        <div class="border-t-[1px] border-t-zinc-700 mt-5 py-3 text-sm">
+                        <div
+                        class="border-t-[1px] flex justify-between items-center border-t-zinc-700 mt-5 py-3 text-sm">
+                        <h3>
                             <%= post.likes.length %> Likes
-                        </div>
+                        </h3>
+                        <a href="/likes/<%= post._id %>">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24">
+                                <path d="M15 12c0 1.654-1.346 3-3 3s-3-1.346-3-3 1.346-3 3-3 3 1.346 3 3zm9-.449s-4.252 8.449-11.985 8.449c-7.18 0-12.015-8.449-12.015-8.449s4.446-7.551 12.015-7.551c7.694 0 11.985 7.551 11.985 7.551zm-7 .449c0-2.757-2.243-5-5-5s-5 2.243-5 5 2.243 5 5 5 5-2.243 5-5z" fill="#ffffff"/>
+                            </svg>
+                        </a>
+                    </div>
                         <div class="btns gap-4 flex">
                             <a href="/like/<%= post._id %>" class="text-pink-500">
                                 <%= post.likes.indexOf(profile._id) === -1 ? "Like" : "Unlike" %>

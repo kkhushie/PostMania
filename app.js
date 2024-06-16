@@ -173,6 +173,33 @@ app.get('/delete/:id', isLoggedIn, async (req, res) => {
         res.redirect('/profile');
     }
 });
+app.get('/delete/user/:id', isLoggedIn, async (req, res) => {
+    try {
+        const user = await userModel.findById(req.params.id);
+        if (!user) {
+            return res.redirect('/users/data');
+        }
+        await userModel.deleteOne({ _id: req.params.id });
+        res.redirect('/users/data');
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.redirect('/users/data');
+    }
+});
+
+app.get('/likes/:id', async (req, res) => {
+    try { 
+        const post = await postModel.findById(req.params.id).populate('likes'); // Populate the 'likes' field
+        if (!post) {
+            console.log(`No post found with ID: ${req.params.id}`);
+            return res.redirect('/feed');
+        }
+        res.render('likes', { likes: post.likes }); // Pass the list of users who liked the post to the view
+    } catch (err) { 
+        console.error('Error fetching likes:', err); // Log the actual error variable
+        res.redirect('/feed');
+    }
+});
 
 app.get('/like/:id', isLoggedIn, async (req, res) => {
     try {
@@ -262,6 +289,17 @@ app.get('/api/posts', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
+app.get('/users/data', isLoggedIn, async (req, res) => {
+    try {
+        let users = await userModel.find();
+        res.render('adminpage', { users })
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send('Internal Server Error');
+    }
+})
 
 app.listen(3000, () => {
     console.log("server is running");
