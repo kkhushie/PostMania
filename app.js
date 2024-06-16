@@ -95,7 +95,7 @@ app.post("/register", async (req, res) => {
 
                 let token = jwt.sign({ email: email, userid: user._id }, process.env.JWT_SECRET);
                 res.cookie("token", token, { secure: true, httpOnly: true });
-                res.redirect("/feed");
+                res.redirect("/profile");
             });
         });
     } catch (error) {
@@ -120,7 +120,7 @@ app.post("/login", async (req, res) => {
             if (result) {
                 let token = jwt.sign({ email: email, userid: user._id }, process.env.JWT_SECRET);
                 res.cookie("token", token, { secure: false, httpOnly: true }); // Set secure to true if using HTTPS
-                res.redirect('/feed');
+                res.redirect('/profile');
             } else {
                 console.log('Password mismatch');
                 res.redirect("/login");
